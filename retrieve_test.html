@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  	<!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    
+   <!-- Latest compiled and minified BootStrap JavaScript -->
+	 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> 
+	 
+   <!-- jQueryUI CDN -->
+      <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script> 
+      	 
+  <!-- jQuery Validate CDN -->
+	  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"></script>
+	  
+  <!-- Latest compiled and minified Bootstrap/jQueryUI Theme CSS -->
+	   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/readable/bootstrap.min.css">
+       <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	 
+    <!-- Bootstrap CSS CDN ------>
+     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">	 
+          
+     <!-- Alert js file. Usage- $.alert(message, title) -->
+    	<script src="alert.js"></script>  	 
+  	
+  	<!-- Main CSS file -->
+     <link rel="stylesheet" type="text/css" href="main.css">
+     
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     
+    <title>Retrieve Test</title> 
+  </head>
+  
+ <body>
+ 	
+     <!----------------------> 	
+ 	 <!-- Nav Menu Markup --->
+ 	 <!---------------------->
+ 	 
+<div class="container-fluid">
+  <ul class="nav nav-tabs nav-justified">
+    <li><a href="testgen.html">Goto Exam Generator</a></li>
+    <li><a href="display_scores.php">Goto Student Exam Scores</a></li>
+    <li  class="active"><a href="#">Retrieve an Exam</a></li>
+  </ul>
+</div>
+ 	
+ 	  <!------------------------> 	
+ 	  <!-- Main Body Markup ---->
+ 	  <!------------------------>
+ <div class="container-fluid">
+  <div class="jumbotron">
+  	  	
+   <h2 id="title">SHS Quiz App&nbsp; <span class="glyphicon glyphicon-education" aria-hidden="true"></span></h2>
+  
+  <div class="cke_question">
+ 		<form id="get_test" action="">
+ 			Exam To Retrieve&nbsp;<input type="text" class="choice" id="test_name" name="test_name" size="25" /><br /><br />
+ 			<button type="button" class="btn btn-primary" id="rtrv_button">Retrieve Exam </button>&nbsp;
+ 			<button type="button" class="btn btn-primary" id="reset_button">Reset</button>
+ 		</form>
+  </div>
+  <br />
+  <br />
+  
+      <!-------------------------> 	
+ 	  <!-- Exam  Markup --------->
+ 	  <!------------------------->
+  <div id="container" class="choice_answers">
+  	<div id="question_div"></div>
+      <form id="choices_return"></form>
+              
+  </div>
+ </div>
+</div>
+	
+	<!-- ========================================================================================================================== ->
+      <!---------------------------------- >  
+      <!-- Begin JS/jQuery for page ------ >
+      <!----------------------------------->       
+	
+	<script>
+         	
+     	 $(document).ready(function() {
+     	 	// --------------------------------------- //
+     	 	// Initialize Validate plugin ------------ //
+     	 	// with use of additional method "regex"-- //
+     	 	$("#get_test").validate({
+     	 		rules: {
+                  test_name: {
+                    required: true,
+                    regex: true
+                  }
+               }
+     	 	});
+     	 	
+     	 	// Custom Method for Validate plugin to check for //
+     	 	// alpha-numeric input -------------------------- //
+     	 	// ---------------------------------------------- //
+     	 	
+     	 	$.validator.addMethod("regex", function(value, element) {
+               return this.optional(element) || /^[a-z0-9\-\_\ ]+$/i.test(value);
+               }, "Filename must contain only letters, numbers,dashes, or underscores.");
+
+     	 	// End Validate regex special method definition---- //
+     	 	// ------------------------------------------------ //
+     	 	
+     	 	// ----------------------------------------------- //
+     	 	// End Validate initialization and regex method -- //
+     	 	// definition ------------------------------------ //
+     	 	
+     	 	 //----------------------------------- // 	
+ 	         //-- Retrieve Exam jQuery Function ---//
+ 	         //----------------------------------- //
+ 	         
+ 	       // ---------------------------------------------------------------------- // 
+ 	       // This function allows us to hook into the #rtrv_button.on(click) ------ //
+           // event handler when we hit enter key in the #test_name form input field // 
+           // ---------------------------------------------------------------------- // 
+          $('#test_name').keypress(function (e) {
+             var key = e.which;
+             if(key == 13) {// the enter key code
+                $("#rtrv_button").click();
+                return false;  
+              }
+          });
+          // -------------------------------------------- //
+          // End of hook into on.(click) event handler -- //
+          // -------------------------------------------- //
+     	 	     	 	
+     	 	$("#rtrv_button").on("click", function(){ 
+     	 	  $( "p" ).remove();  // Clear any previous Questions and Choices from the page.
+     	 	  if (!$("#get_test").valid() )  { //  use .valid() to test for validity
+                   	      return false; // prevent continuation of script until form validates 
+                   	   }                // Rules are in the #get_test Form Markup for this instance
+     	 	  
+     	 	  requestedTest = $("#test_name").val();
+     	 	
+     	 	  // AJAX Request
+     	 	  $.ajax({
+                url: "tests/" + requestedTest + ".json",
+                cache: false,
+                dataType: "json",
+                success: function(data,status) { // Grab JSON file off server and print it out
+                  var testReturn = data;
+                  var choice_results = "";
+                  
+                  for (var i = 0; i < testReturn[0].question.length ; i++) {
+                  	var question = testReturn[0].question[i];
+                  	question = question.replace(/(<p[^>]+?>|<p>|<\/p>)/img, ""); // Strip out<p> tag ckeditor puts in.
+                  	console.log(question);
+                  	$(".cke_question").append("<p class='question_return" + i + "'>" + "<strong>" + (i + 1) + ")" + "&nbsp" + question + "</strong></p>");
+                  	
+                  	//Print Out Choices
+                      for (var j = 0; j < testReturn[0].choices[i].length; j++) {
+                      	var chr = String.fromCharCode(97 + j); // where n is 0, 1, 2 ...
+                        choice_results += "<br />&nbsp<em>" + chr + ")</em>&nbsp<input id='answers" + i + j +"' type='radio' disabled>" + "<span class='choice_text'>&nbsp" + testReturn[0].choices[i][j] + "</span>";
+                      }
+                      $(".question_return" + i).append(choice_results);
+                      $("#answers" + i + testReturn[0].correctAnswer[i]).prop("checked",true); // Mark correct radio button answer 
+                      choice_results = ""; // Clear Choices before rendering next question.
+                  }
+                }, // End Success Function
+                error: function(jqxhr,status,error) {
+                  $.alert("Error: " + error, "Alert");
+                } 
+              }); // End AJAX function
+          
+     	 	  
+     	 	}); 
+     	 	 //--------------------------------------- // 	
+ 	         //-- End Retrieve Exam jQuery Function ---//
+ 	         //--------------------------------------- //
+     	 	     	 		
+     	 	// Reset Button click -------------//
+     	 	$("#reset_button").on("click", function(){ 
+     	 		$("#get_test").trigger("reset");
+     	 	});
+     	 	// End Reset Button click ----- //
+     	 	
+     	 }); // End .(document).ready
+     </script>
+	
+ </body>
+
+</html>

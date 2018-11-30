@@ -1,0 +1,264 @@
+html body {
+    min-height:100%;
+    background:#CED8F6;
+ }
+ 
+ body {
+   padding-top: 70px; 
+ }
+  
+  	h1 {
+  	  text-align:center;
+  	}
+  	
+  	h2 {
+  	  color:maroon;
+  	  text-align:center;
+  	}
+  
+    h3 p {font-size:24px;
+      text-align:center;
+    }
+    
+    div.hidden {
+      display: none
+    }
+    
+    li {
+      font-size: 24px;
+    }
+    
+    em {
+      font-size: 24px;
+    }
+  	
+  	#opener {
+  	 position:relative;
+  	 left:400px;
+  	 top:150px
+  	}
+  	
+  	footer  {
+  	  position: relative;
+  	  bottom: -735px;
+  	  left: 550px;
+  	}
+  	  	
+  	.choice  {
+  	  border: 2px solid #dadada;
+      border-radius: 7px;
+    }
+
+    .choice:hover   {
+  	  outline: none;
+      border-color: #9ecaed;
+      box-shadow: 0 0 10px #9ecaed;
+    }
+
+    .choice:focus { 
+      outline: none;
+      border-color: #9ecaed;
+      box-shadow: 0 0 10px #9ecaed;
+    }
+    
+    .choice_text {
+       font-size: 22px;
+    }
+        
+    #cke_1_contents  {
+  	  border: 2px solid #dadada;
+      border-radius: 7px;
+    }
+
+    #cke_1_contents:hover   {
+  	  outline: none;
+      border-color: #9ecaed;
+      box-shadow: 0 0 10px #9ecaed;
+    }
+
+    #cke_1_contents:focus { 
+      outline: none;
+      border-color: #9ecaed;
+      box-shadow: 0 0 10px #9ecaed;
+    }
+      
+    
+    #question {
+      font-size: 26px;
+    }
+    
+    .error  {
+      color:red;
+    }
+    
+    #title {
+      color:#7E3B3B;	       	
+    }
+    
+    #submitTest {
+     position:relative;
+     left: 400px;
+    }
+
+     th {
+       strong { font-weight: bold; }
+        text-align: center;
+        font-size: 24px;
+        color: DarkBlue;
+        background-color:#B0C4DE;
+        text-decoration: underline;
+        cursor: default;
+        padding-left: 8px;
+        padding-right: 8px;
+        border-bottom-color: #000000;
+      }
+
+      table  {
+	    border: ridge;
+	    border-width: 9px;
+      }   
+
+    /* Define a class to highlight Table rows on hover but not the Table Header row */
+      tr:hover.first {
+        background-color: LightSkyBlue;
+      }
+
+     /* Shade Rows */
+     tr:nth-child(even)		{ background-color:#B0C4DE; }
+     tr:nth-child(odd)		{ background-color:#ADD8E6; }
+
+     td{
+	   font-size: 20px;
+	   font: calibri;
+	   border: outset;
+	   border-color: #000000;
+	   border-width: 2px;
+	   padding-top: 7px;
+	   padding-bottom: 2px;
+	   padding-left: 8px;
+	   padding-right: 8px;
+     }
+
+   /* Shows Symbol for Table Header Sorting Available */
+    table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+      content: " \25B4\25BE" 
+    }
+    
+     .btn_pgn
+            {
+              text-decoration: none;
+              color: #FFFFFF;
+              padding-left: 10px;
+              padding-right: 10px;
+              margin-left: 1px;
+              margin-right: 1px;
+              border-radius: 3px;
+              background: #7F83AD;
+              font-weight:bold;
+              font-size: large;
+            }
+            
+            .btn_pgn:hover
+            {
+                background: #474C80;
+            }
+            
+            .active
+            {
+                background: #E7814A;
+            }
+     #pagination_pos {
+     	position: relative;
+     	top: 100px;
+     }
+     
+     
+/* Style The Text Input Boxes */
+.input_style[type=text], .input_style[type=date]  {
+    background: white;
+    border: 2px solid #87CEFA;
+    border-radius: 25px;
+    -moz-box-shadow:    inset 0 0 10px #87CEFA;
+    -webkit-box-shadow: inset 0 0 10px #87CEFA;
+    box-shadow:         inset 0 0 10px #87CEFA;
+    background-color:Ivory;
+    padding: 5px 10px;
+    width: 185px;
+    outline: none;
+    height:35px;
+}
+
+
+/* Input Box hover styling */
+.input_style:hover {
+    border: 2px solid #00008B;
+    background-color: GhostWhite;
+}
+
+
+#input_select {
+    background: white;
+    border: 2px solid #87CEFA;
+    -moz-box-shadow:    inset 0 0 10px #87CEFA;
+    -webkit-box-shadow: inset 0 0 10px #87CEFA;
+    box-shadow:         inset 0 0 10px #87CEFA;
+    background-color:Ivory;
+    padding: 5px 10px;
+    width: 165px;
+    outline: none;
+}
+
+#input_select:hover {
+    border: 2px solid #00008B;
+    background-color: GhostWhite;
+}
+
+.def_search {font-family: verdana;
+  color: #14396A !important;
+  font-size: 14px;
+  font-weight:bold;
+  text-shadow: 1px 1px 0px #7CACDE;
+  box-shadow: 1px 1px 1px #BEE2F9;
+  padding: 10px 15px;
+  -moz-border-radius: 25px;
+  -webkit-border-radius: 25px;
+  border-radius: 25px;
+  border: 2px outset #3866A3;
+  background: #63B8EE;
+  background: linear-gradient(top,  #63B8EE,  #468CCF);
+  background: -ms-linear-gradient(top,  #63B8EE,  #468CCF);
+  background: -webkit-gradient(linear, left top, left bottom, from(#63B8EE), to(#468CCF));
+  background: -moz-linear-gradient(top,  #63B8EE,  #468CCF);
+}
+
+.def_search:hover   {
+  color: #14396A !important;
+  background: #468CCF;
+  background: linear-gradient(top,  #ACCDCF,  #63B8EE);
+  background: -ms-linear-gradient(top,  #ACCDCF,  #63B8EE);
+  background: -webkit-gradient(linear, left top, left bottom, from(#ACCDCF), to(#63B8EE));
+  background: -moz-linear-gradient(top,  #ACCDCF,  #63B8EE);
+
+}
+  #frm_style {
+  	position: relative;
+  	left: 375px;
+  }
+  
+  #get_test {
+  	font-size: 24px;
+  }
+  
+  .wrong_answer {
+  	color: red;
+  }
+  
+   .answer_number {
+   	 font-size: 24px;
+   }
+   
+   #button_display_scores {
+   	 float: right; 
+   }
+            /* End CSS */
+ </style>

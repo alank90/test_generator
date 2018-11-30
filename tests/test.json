@@ -1,0 +1,42 @@
+[{
+	"question": [
+		"Who is Prime Minister of the United Kingdom?",
+		"Who is the Vice-President of the United States?",
+		"Who is Chancellor of Germany?",
+		"Who is the Prime Minister of Canada?"
+	],
+	"choices": [
+		[
+			"David Cameron",
+			"Gordon Brown",
+			"Winston Churchill",
+			"Tony Blair"
+		],
+		[
+			"Barack Obama",
+			"Bernie Sanders",
+			"Nancy Pelosi",
+			"Joe Biden"
+		],
+		[
+			"Franz Ritz",
+			"Angela Merkel",
+			"Jan Schroeder",
+			"John Stevens",
+			"Karl Marx"
+		],
+		[
+			"Wayne Gretsky",
+			"Pierre Trudeau",
+			"Mike Myers",
+			"Justin Trudeau",
+			"Justin Bieber"
+		]
+	],
+	"correctAnswer": [
+		0,
+		3,
+		1,
+		3
+	]
+}]

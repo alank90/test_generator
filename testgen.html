@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <!-- jQuery CDN -->
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+       
+        <!-- jQueryUI CDN -->
+      	 <script src="  https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script> 
+          	
+    	<!-- Latest compiled and minified CSS for jQuery UI & Bootstrap-->
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/readable/bootstrap.min.css">
+    	 <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    	    	 
+        <!-- Main CSS file -->
+         <link rel="stylesheet" type="text/css" href="main.css">
+    	 
+    	<!-- jQuery Validate CDN -->
+    	  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"></script>
+    	
+    	<!-- Alert js file. Usage- $.alert(message, title) -->
+    	  <script src="alert.js"></script>  
+    	
+    	<!-- CKEditor js file -->
+    	  <script src="ckeditor/ckeditor.js"></script>   
+		
+		<!-- Latest compiled and minified BootStrap JavaScript -->
+		 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> 
+         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>Test Generator</title>
+  <meta name="description" content="">
+  <meta name="author" content="akillian">
+
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+  
+  
+
+</head>
+
+<!--------------------------------->
+<!--  Begin HTML Markup for page --> 
+<!--------------------------------->
+<body>
+  
+<div>  
+	<!-------------------------------->
+	<!-- Begin Markup For Nav Tab ---->	
+	<!-------------------------------->
+<div class="container-fluid" id="nav_div">
+  <ul class="nav nav-tabs nav-justified">
+    <li class="active"><a href="#">Exam Generator</a></li>
+    <li><a href="display_scores.php" target="_blank">See Student Scores</a></li>
+    <li><a href="retrieve_test.html" target="_blank">Retrieve an Exam</a></li>
+  </ul>
+</div> 
+  <!-- End Nav Tabs -->
+  
+  <div>	
+ 
+    <header>
+      <h2> SHS Test Generator App&nbsp;<span class="glyphicon glyphicon-education glyphicon-right"></span></h2>
+    </header>
+     	<div><button id="opener" class="btn btn-info btn-lg">Let's Get Started. Click to Begin Creating a Test</button></div>
+  <!------------------------------------------>
+  <!-- Test Questions & Answers Form Markup -->
+  <!------------------------------------------>
+    <div id="dialog"  class="hidden" title="Test Question with Choices">
+     <form id="test" action="">
+       <label for="Choice">Enter Test Question:</label><br /><br />
+         <textarea class="choice" rows="4" cols="60" id="question" name="question"></textarea><br /><br />
+       <label for="Choice">Enter Question Choices:</label><br /><br />
+         a)&nbsp;<input type="text" id="c0" class="choice" name="a" size="55"/><br /><br />
+         b)&nbsp;<input type="text" id="c1" class="choice" name="b" size="55"/><br /><br />
+         c)&nbsp;<input type="text" id="c2" class="choice" name="c" size="55"><br /><br />
+         d)&nbsp;<input type="text" id="c3" class="choice" name="d" size="55"/><br /><br />
+         e)&nbsp;<input type="text" id="c4" class="choice" name="e" size="55"/><br />
+       <br />
+       <br />
+       <label for="Correct Answer">Enter Correct Answer:</label><br />
+         <input type="text" id="correctAnswer"  class="choice" name="answer" size="3" /><br />
+
+     </form>
+     <div id="question_counter"></div>
+   </div><br /> 
+   
+   <!----------------------------------------> 
+   <!-- Submit The Exam Button Form Markup -->
+   <!---------------------------------------->
+    <div id="submit_dialog" class="hidden" title="Submit Questions">
+     <form id="submit_test" action="">
+      <label for="Submit">Save Test as File Name:</label><br />
+         <input type="text" id="file_nm" name="file_name" size="25" /><br />
+     </form>
+   </div> 
+ </div>
+    
+    <footer>
+     <p>&copy; Copyright  by Alan Killian</p>
+    </footer>
+  </div>
+  
+  <!-- ==========================================================================================================================-->
+      <!---------------------------------- >  
+      <!-- Begin JS/jQuery for page ------ >
+ <!-- ===========================================================================================================================-->   
+   <script>
+
+    $(document).ready(function() {
+     $("div.hidden").removeClass("hidden"); // Made forms hiiden on load so they wouldnt temporerily appear. 
+                                            // Now we remove the "hidden" from the form div's' class. 	
+   	//JS Object to store all the questions,choices & answers
+     var testquestions = [{
+        question:[],
+        choices:[],
+        correctAnswer:[],
+       }
+      ];
+      var i = 0;
+      
+      // ------------------------------------------------------- //
+      // Replace the <textarea id="question"> with a CKEditor -- //
+      // instance, using default configuration. ---------------- //
+         CKEDITOR.replace( 'question' );
+      
+    // ------------------------------------------------------------------------------------ // 
+    // Initialize the Validation plugin for the forms on the page. And add rules for when - //
+    // you call .valid() to check for validity on the forms.------------------------------- //
+    // ------------------------------------------------------------------------------------ //
+      $("#test").validate({  
+         rules: {
+            //question: "required", // This not working. CKEditor replaces textarea. Needs fixing.
+            a: "required",
+            b: "required",
+            answer: {
+               required: true,
+               correctAnswer: true
+            }
+         }
+       });
+       
+       
+       // Custom Method for Validate plugin to check for  //
+       // letters a-e only in Answer field input ------- //
+      // ---------------------------------------------- //
+     	 	
+     	 $.validator.addMethod("correctAnswer", function(value, element) {
+             return this.optional(element) || /^[a-e]+$/i.test(value); // Regex expression to check for a-e letters.
+             }, "Correct Answer must contain only letters a-e.");
+
+       // End Validate regex special method definition---- //
+      // ------------------------------------------------ //
+       
+       $("#submit_test").validate({  
+         rules: {
+            file_name:{
+              required: true,
+              minlength: 3,
+              regex: true // Special method added to validate plugin
+            } 
+         }
+       }); 
+       
+       // Custom Method for Validate plugin to check for //
+       // alpha-numeric input -------------------------- //
+      // ---------------------------------------------- //
+     	 	
+     	 $.validator.addMethod("regex", function(value, element) {
+             return this.optional(element) || /^[a-z0-9\-\_\ ]+$/i.test(value); // Yes there is a space at end of regex check
+             }, "Filename must contain only letters, numbers,dashes, or underscores.");
+
+     	   // End Validate regex special method definition---- //
+           // ------------------------------------------------ //
+           
+       //------------------------------------ //       
+      // End Validate Plugin Initialization - //
+      //------------------------------------ //    
+      
+      $( "#dialog" ).dialog({ autoOpen: false, width: 900}); //Initialize #dialog box
+      $( "#submit_dialog" ).dialog({ autoOpen: false }); //Initialize #submit_dialog box
+      
+      // --------------------------------------------------------------------------------- //
+      // Generate Test Function. This will manipulate the DOM as you go thru the test ---- //
+      // showing the appropriate html elements at any given place in exam process. - //
+      // --------------------------------------------------------------------------------- //
+      
+      $( "#opener" ).click(function() {
+      	  $( "#dialog" ).dialog( "open" );
+      	  $( "#question_counter" ).html( "<br/><p>Current Question <em>" + (testquestions[0].question.length  + 1) + "</em></p>" );
+          
+          var $nav = $("#nav_div");
+      	  $( "#dialog" ).dialog({
+      	  	position: {my:"bottom", at:"bottom", of:$nav},
+            minWidth: 700,
+            minHeight: 650,
+            close: function() {
+               $("#opener").fadeIn("slow"); //Fade In Generate Button
+            },
+            buttons: [
+                 {
+                   text: "Add Question",
+                   click: function() {
+                     if (!$("#test").valid() )  { //  use .valid() to test for validity
+                   	   return false; // prevent continuation of script until form validates 
+                   	 } 
+                   	                   	
+                     i = testquestions[0].question.length;
+                     // ----------------------------------------------------------------------------------- //
+                     //Here we use the FCKEditor Javascript API to assign value in CKEditor --------------- //
+                     // box to testquestions.question. See http://docs.ckeditor.com/#!/api ---------------- //
+                     // ----------------------------------------------------------------------------------- //
+                     testquestions[0].question[i] = CKEDITOR.instances.question.getData();
+                     testquestions[0].choices[i] = [];
+                     for(var k = 0; k <= 4; k++){
+                       if ($("#c" + k).val() != "")  {
+                        testquestions[0].choices[i][k] = $( "#c" + k ).val();
+                       }
+                     }  // for k
+                     testquestions[0].correctAnswer[i] = $("#correctAnswer").val().toLowerCase();
+                      // Convert letter to number
+                     testquestions[0].correctAnswer[i] = testquestions[0].correctAnswer[i].charCodeAt(0) - 97;
+                     $( "#question_counter" ).html( "<br/><p>Current Question <em>" + (testquestions[0].question.length  + 1) + "</em></p>" );
+                     CKEDITOR.instances["question"].setData(''); // Cleat CKEditor area
+                     $("#test")[0].reset();                      
+                   }
+                 },
+                 {
+                   text: "Submit The Exam",
+                   click: function() {
+                   	 $( "#submit_dialog" ).dialog( "open" );
+                   	 $( "#submit_dialog" ).dialog({	
+                   	 	buttons: [
+                   	 	  {
+                   	 	  	text: "Submit Test",
+                   	 	  	click: function() {
+                   	 	  		if (testquestions[0].question.length == 0) {
+                   	 	  			$( "#submit_dialog" ).dialog( "close" );
+                   	 	  			$.alert("Error. No Questions in the Exam.","Error");
+                   	 	  			return false;
+                   	 	  		}
+                   	 	  		
+                   	 	  		if (!$("#submit_test").valid() ) { //  use .valid() to test for validity
+                   	              return false;
+                   	            } 
+                   	 	  		
+                   	 	  	    // JSON.stringify() which serializes a Javascript object into a JSON string to then use post method
+                   	           // to send to the php script for processing. 
+                               str_testquestions = JSON.stringify(testquestions);
+                               // Now want To get file name from form
+                               testFileName = $( "#file_nm" ).val();
+                   
+                               $.ajax({
+                                 method: "POST",
+                                 cache: false,
+                                 dataType: "text",
+                                 processData:"false",
+                                 url: "test_save.php",
+                                 data: {"testquestions": str_testquestions, "fileName": testFileName},
+                                 success: function(response,status,jqxhr) {
+                                 	$.alert(jqxhr.responseText,"Message");
+                                 },
+                                 error: function(jqXHR,status) {
+                                 	$.alert(status + ". Failed to save exam. Please check your System Administrator","Error");                                 	
+                                 }
+                                 
+                               }), //end AJAX call
+                   	 	  	  $( "#submit_dialog" ).dialog( "close" );
+                   	 	  	} // End Submit Test Click Function 
+                   	 	  },  // End Submit the Exam Buttons Object 
+                   	 	  {
+                   	 	  	text: "Cancel",
+                   	 	  	click: function () {
+                   	 	  		$( "#submit_dialog" ).dialog( "close" );
+                   	 	  	}
+                   	 	  }
+                   	 	] // End Submit The Exam buttons array
+                   	 	
+                   	 	
+                   	 });  // End Submit dialog
+                  	     
+                  } // End Submit Exam button click object
+                  
+                   // Uncommenting the following line would hide the text,
+                  // resulting in the label being used as a tooltip
+                  //showText: false
+                }
+             ]  //End of Buttons option array
+          });
+        $("#opener").fadeOut("slow"); //Fade Out Generate Button
+      });
+      // ----------------------------- //
+      // End Generate Test FUnction -- //
+      // ----------------------------- //
+      
+   });  // End (document).(ready)   
+  
+//--------------------//
+//-- End JS for Page -//
+//--------------------//
+  </script>
+</body>
+</html>

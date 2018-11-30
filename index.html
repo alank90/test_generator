@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    	<!-- jQuery CDN -->
+    	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+      
+        <!-- jQueryUI CDN -->
+      	 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script> 
+      	 
+      	 <!-- jQuery Validate CDN -->
+    	  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"></script>
+    	  
+    	 <!-- Alert js file. Usage- $.alert(message, title) -->
+    	  <script src="alert.js"></script>  
+    	
+    	<!-- Latest compiled and minified Bootstrap/jQueryUI Theme CSS -->
+		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/readable/bootstrap.min.css">
+    	 <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        
+        <!-- Main CSS file -->
+         <link rel="stylesheet" type="text/css" href="main.css">
+
+		<!-- Optional Readable Theme -->
+		 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/cerulean/bootstrap.min.css"> 
+
+		<!-- Latest compiled and minified BootStrap JavaScript -->
+		 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Quiz App</title>
+      
+    </head>
+    
+    <!---------------------->
+    <!-- Main HTML Markup -->
+    <!---------------------->
+    <body>
+<div class="container-fluid">
+  <div class="jumbotron">
+  <h2 id="title"> <span class="glyphicon glyphicon-education" aria-hidden="true"></span>&nbsp;
+     SHS Quiz App
+  </h2>
+  <div id="container">
+   <p id="question">
+    <h3 id="intro">Welcome to the SHS Exam Site.<br /> Begin by Selecting an Exam.</h3>
+   </p>
+    <br/>
+      <form id="test1"></form>
+      
+      <br />
+       <br />
+      
+      <div id="div4"></div>
+        <div id="div3"></div>
+          <div id="div2">
+          	<button id="get_exam" class="btn btn-info btn-lg">Click Here to Retrieve an Exam.</button>
+          </div>
+    <br/>
+  </div>
+ </div>
+</div>
+<!-------------------------->
+<!-- End Main HTML Markup -->
+<!-------------------------->
+
+ <!-------------------------------------------------->
+ <!-- Retrieve Test from Server Dialog Form Markup -->
+ <!-------------------------------------------------->
+    <div id="retrieve_test" class="hidden" title="Retrieve Test">
+     <form id="rtrv" action="">
+      <label for="Submit">Please Type Test to Take</label><br />
+         <input type="text" id="file_nm" name="file_name" size="25"/><br />
+     </form>
+    </div>
+ <!-- End Retrieve Test from Server Dialog Form Markup -->
+    
+  <!---------------------------------------------->
+  <!-- Student Submit Test Score Form Markup ----->
+  <!---------------------------------------------->
+     <div id="submit_test" class="hidden" title="Test Submittal">
+        <form id="submit_score" action="">
+          <label for="submit_score">Enter Information to Submit Your Test</label>
+            First Name&nbsp;<input type="text" id="fname" name="fname" size="15" maxlength="15" required><br />
+            Last Name&nbsp;<input type="text" id="lname" name="lname" size="20" maxlength="25" required><br />
+            Name of Test&nbsp;<input type="text" id="test_name" name="test_name" size="30" maxlength="50" required><br />
+            Teacher Name&nbsp;<input type="text" id="teacher_name" name="teacher_name" size="30" maxlength="40" required><br />
+        </form>
+     </div> 
+ <!-- End Student Submit Test Score Form Markup ----->
+ 
+ 
+ <!-- ========================================================================================================================== ->
+      <!---------------------------------- >  
+      <!-- Begin JS/jQuery for page ------ >
+      <!----------------------------------->           
+    <script>
+ $(document).ready(function() {
+   $("div.hidden").removeClass("hidden"); // Made forms hiiden on load so they wouldnt temporerily appear. 
+                                          // Now we remove the "hidden" from the form div's' class.
+ 	
+   // ----------------------------- //   
+   // Initialize Variables -------- //
+   // ---------------------------- //
+  var questionCounter = 0;
+  var givenAnswer = [];
+  var answerTally = 0;
+  var score = 0;
+  var submitAnswerClick = false;
+  var i = questionCounter;
+  var noSelection = false;
+  var testFile = "";
+  var testName = "";
+  var allQuestions = null;
+  var student_answers = [];
+  
+     // ----------------------------------------------------------------------------------- // 
+    // Initialize the Validation plugin for the forms on the page. And add rules for when - //
+    // you call .valid() to check for validity on the form.                          ------ //
+    // ------------------------------------------------------------------------------------ //
+   $("#rtrv").validate({  
+         rules: {
+            file_name:{
+              required: true,
+              minlength: 3
+            } 
+         }
+       }); 
+       
+       
+   // Student Score Form Validation
+    $("#submit_score").validate();    
+  // ------------------------------------- //
+  // End Validate Initialization for forms //  
+  // ------------------------------------- //
+  
+ // -------------------------------------------------------------------//
+ // jQuery UI Dialog widget to get the json file off the server        //
+ //                                                                    //
+ // -------------------------------------------------------------------//
+ 
+ $( "#retrieve_test" ).dialog({ autoOpen: false }); //Initialize Retrieve Test dialog on page load
+ 
+      // ------------------------------------------------------------------------- // 
+ 	  // This function allows us to hook into the #retrieve_test jQuery UI ------- //
+      // event handler when we hit enter key in the Retrieve Test form input field // 
+      // ------------------------------------------------------------------------- // 
+          $('#file_nm').keypress(function (e) { // Form input id
+             var key = e.which;
+             if(key == 13) {// the enter key code
+                $("button:contains(Retrieve Test)").click(); // Event Handler id
+                return false;  
+              }
+          });
+          // ----------------------------------------------- //
+          // End of hook into Retrieve Test event handler -- //
+          // ----------------------------------------------- //
+ 
+ $("#get_exam").on('click', function() {
+   $( "#retrieve_test" ).dialog("open");
+   $( "#retrieve_test" ).dialog({
+   	   modal: false,
+       buttons: 
+          [
+            {
+               text: "Retrieve Test",
+               click: function () {
+               	        if (!$("#rtrv").valid() )  { //  use .valid() to test for validity
+                   	      return false; // prevent continuation of script until form validates 
+                   	    } 
+                	    testFile = "tests/" + $("#file_nm").val() + ".json";
+                      	// jQuery AJAX request to read JSON formatted Test Questions & Answers from server file
+                        $.ajax({
+                          url: testFile,
+                          cache: false,
+                          dataType: "json",
+                          success: function(result) {
+                            allQuestions = result;
+                            var posFirst = testFile.indexOf("/"); 
+                            var posLast = testFile.indexOf(".");
+                            testName = testFile.slice(posFirst + 1,posLast); 
+                            var testTitle = "<h2 id='title'> <span class='glyphicon glyphicon-education' aria-hidden='true'></span>&nbsp;SHS Quiz App - " + testName + "</h2>";
+                            $("#title").html(testTitle);
+                            $("#div2").html("<button id='next' class='btn btn-info btn-lg'>Begin Test</button>");
+                            $("#intro").text(" Succesfully retrieved exam. Begin when Instructed.");
+                            $( "#retrieve_test" ).dialog( "close" );
+                          },
+                          error: function(jqXHR,status,error) {
+                          	$( "#retrieve_test" ).dialog( "close" );
+                          	$.alert(" Message: " + status + " " + error + ". Check the spelling of the file.","Alert!");
+                          	//$( "#retrieve_test" ).dialog( "open" );
+                          }
+                        }); // End AJAX call
+                        
+                 } //End Retrieve Test click function
+            },  // End Retrieve Test Buttons Object 
+                   {
+                   	   text: "Cancel",
+                   	   click: function () {
+                   	 	  $( "#retrieve_test" ).dialog( "close" );
+                   	 	  return false;
+                       }
+                   }
+          ] // End Retrieve Test buttons array
+                                     	 	
+ });  // End Retrieve Test Dialog
+}); //  End $("#get_exam").on('click') function call
+
+ // ------------------------------------------------------------------  //
+ // End jQuery UI for Dialog widget to get the json file off the server //
+ //                                                                     //
+ // ------------------------------------------------------------------  //
+  
+ 
+ // -------------------------------------------------------------------- //
+ // Submit Student Test Dialog and function  --------------------------- //
+ // Using Event Delegation here "on('click', '#submitTest', function()"- //
+ // See http://learn.jquery.com/events/event-delegation ---------------- //
+ // -------------------------------------------------------------------- //
+ $( "#submit_test" ).dialog({ autoOpen: false, width: 400}); //Initialize #submit_form  on page load
+
+ $("#div2").on('click', '#submitTest', function() {
+   $("#test_name").val(testName);
+   $( "#submit_test" ).dialog("open");
+   $( "#submit_test" ).dialog({
+        
+   	   buttons: 
+          [
+            {
+               text: "Submit Score",
+               click: function () {
+               	       if (!$("#submit_score").valid() )  { //  use .valid() to test for validity
+                   	      return false; // prevent continuation of script until form validates 
+                   	   }                // Rules are in the #submit_score Form Markup for this instance
+               	       
+               	       // Setup variables so we can $_POST form values and the student exam score     	
+               	         var score = Math.round(answerTally / allQuestions[0].question.length * 100);   
+               	         var form_info =  $("#submit_score" ).serialize();
+               	         form_info += "&score=" + score + "&student_answers=" + student_answers;
+                      	// jQuery AJAX request to Submit Student Test Score
+                        $.ajax({
+                          url: "submit_score.php",
+                          method: "post",
+                          processData: "false",
+                          data: form_info,
+                          error: function(jqXHR,status,error) {
+                          	$.alert("Error in submission. See the System Administrator. " + error);
+                         },
+                          complete: function(jqXHR,status) {
+                         	$.alert(jqXHR.responseText,"Message");
+                         	$('#submitTest').on('click', function(event) {
+                               event.preventDefault();
+                               $(this).prop('disabled',true); //disable further test score submissions
+                               $.alert("Sorry. You already submitted your exam.","Message");
+                         	   return false;
+                            });
+                          } //end complete function
+                        });
+               	 	 	$( "#submit_test" ).dialog( "close" );
+                      } //end click function
+            },  // End Retrieve Test Buttons Object 
+                   {
+                   	   text: "Cancel",
+                   	   click: function () {
+                   	 	  $( "#submit_test" ).dialog( "close" );
+                   	   }
+                   }
+          ] // End Retrieve Test buttons array
+                                     	 	
+   }); 	
+ });  // End click function
+ // -------------------------- //
+ // End Submit Test Function - //
+ // -------------------------- //
+ 
+ 
+   // ------------------------------------------------------------------------ //
+  //Check for correct answer and keep tally of total correct answers function. //
+  //  -------------------------------------------------------------------------//
+  function check_answer() {
+    for (var k = 0; k < allQuestions[0].choices[i].length; k++) {
+      //Check if radio button is marked and answer is correct
+      if ((document.getElementById(k).checked == true) && (document.getElementById(k).value == allQuestions[0].correctAnswer[questionCounter])) {
+        //If so, add to tally and increment counters
+        answerTally = answerTally + 1;
+        givenAnswer[questionCounter] = document.getElementById(k).value;
+        student_answers.push(givenAnswer[questionCounter]); // Push student response onto studentAnswers array
+        questionCounter = questionCounter + 1;
+        i = questionCounter;
+        return answerTally;
+      } else if (document.getElementById(k).checked == true) {
+        givenAnswer[questionCounter] = document.getElementById(k).value;
+        student_answers.push(givenAnswer[questionCounter]); 
+        questionCounter = questionCounter + 1;
+        i = questionCounter;
+        return answerTally;
+      } else {
+        // We didnt check a radio button
+        if (k + 1 == allQuestions[0].choices[i].length) {
+          noSelection = true;
+          $("#div4").html("<div id='modal-content' class='modal fade  bs-example-modal-sm' tabindex='-1' role='dialog'>    <div class='modal-dialog modal-sm'>  <div class='modal-content'>  <div class='modal-header'>  <button type='button' class='close' data-dismiss='modal'>×</button>  <h3>Alert.</h3>  </div> <div class='modal-body'>  <p>  No Choice Selected. Please make a selection and then click Next.</p> </div> <div class='modal-footer'> <a href='#' class='btn' data-dismiss='modal'>Close</a> </div> </div> </div></div>");
+          //Note: "modal" is from the Bootstrap API
+          $('#modal-content').modal('show');
+          return noSelection;
+        }
+      }
+    }
+  }
+  // ------------------------------------------------------------------------- //
+  // End Check Answer Function ----------------------------------------------- //
+  //  -------------------------------------------------------------------------//
+  
+  // ---------------------------------------//
+  // Begin Render Prev/Next Button function //
+  // ---------------------------------------//
+  function button_Render() {
+    if (questionCounter == allQuestions[0].question.length) {
+       return;
+    }
+     
+    if (questionCounter == allQuestions[0].question.length - 1) {
+       $("#div2").html("<p><button class='btn btn-info btn-lg' id='prev'><em><span class='glyphicon glyphicon-hand-left' aria-hidden='true'></span>&nbspPrevious</em></button>&nbsp<button class='btn btn-info btn-lg' id='next'><em>Finish</em></button></p>");
+      return;
+    }
+   
+   if ($("#prev")) {
+      $("#prev").remove();
+    }
+ 
+  if (questionCounter == 0) {
+      $("#div2").html("<p><button class='btn btn-info btn-lg' id='next'><em>Next Question &nbsp<span class='glyphicon glyphicon-hand-right' aria-hidden='true'></span></em></button></p>");
+      $("#intro").remove(); 
+    } else if (questionCounter > 0) {
+      $("#div2").html("<p><button class='btn btn-info btn-lg' id='prev'><em><span class='glyphicon glyphicon-hand-left' aria-hidden='true'></span>&nbspPrevious</em></button>&nbsp<button class='btn btn-info btn-lg' id='next'><em>Next Question&nbsp<span class='glyphicon glyphicon-hand-right' aria-hidden='true'></span></em></button></p>");
+    }
+  }
+  // ----------------------------//
+  // End Render Prev/Next button //
+  // ----------------------------//
+  
+  
+  /* Begin Next button click function ------------------------------------ //
+   We use.on() because certain elements don't exist when the ------------- //
+   next function is parsed and events bound to it initially so we must use //
+   "event delegation" for next and prev button functions to work properly. */
+  
+  $('#div2').on('click', '#next', function() {
+    //Check submitAnswerClick,if set we have clicked past the initial introduction and need to call check_answer function
+    if (submitAnswerClick) {
+      check_answer();
+    }
+     
+     // ----------------------------- //  
+    //Print Out Question and Choices  //
+    // ------------------------------ //
+    var question = '';
+    var form = '';
+    if (questionCounter <= allQuestions[0].question.length - 1 && !noSelection) {
+      question = allQuestions[0].question[i];
+      //Print Out Choices
+      for (var j = 0; j < allQuestions[0].choices[i].length; j++) {
+      	var chr = String.fromCharCode(97 + j); // where n is 0, 1, 2 ...
+        form += "&nbsp<em>" + chr + ")</em>&nbsp&nbsp<input class=answers type='radio' name='choice' id=" + j + " value=" + j + ">" + "<span class='choice_text'>&nbsp" + allQuestions[0].choices[i][j] + "</span><br/>";
+      }
+      $("#container").fadeOut("slow", function() {
+        $("#question").html(question);
+        $("#test1").html(form);
+        if (givenAnswer[i]) {
+          document.getElementById(givenAnswer[i]).checked = true;
+        }
+          // ----------------- //
+          // Print Question #  //
+         // ----------------- //
+        if ( questionCounter < allQuestions[0].question.length ) {
+          var totalQuestions = questionCounter;
+          totalQuestions++;
+          $("#div3").html( "<p>Question " + totalQuestions + " of " + allQuestions[0].question.length + "</p>");
+        }         
+      $("#container").fadeIn("slow");
+      });
+
+
+    } else if (!noSelection) {
+      //Let's wrap this up and tidy up loose ends
+      $("#question").replaceWith("<h3><p>Test Over. Thanks for Participating. <br/>Your score was " + Math.round(answerTally / allQuestions[0].question.length * 100) + " % </p></h3>");
+      $("#test1").html('');
+      $("#next").remove();
+      $("#prev").remove();
+      $("#div3").remove();
+      $("#div2").html("<p id='submitTest' class='btn btn-success btn-md'>Click Here If you Would Like to Submit your Exam.</p>");
+    }
+     // -------------------------------------- //
+    // End of Print Out Question & selections  //
+    // --------------------------------------- //
+    
+    
+    //Set so we know initial click has taken place and change the button textNode
+    submitAnswerClick = true;
+    button_Render();
+    noSelection = false;
+  });
+  // ------------------------------ //
+  // End Next Button Click Function //
+  // ------------------------------ //
+  
+  // ----------------------------------- //
+  //Begin Previous Button Click Function //
+  // ----------------------------------- //
+  $('#div2').on('click', '#prev', function() {
+    /* Check if current radio button is marked then save Current -------- //
+     answer (possibly it was changed) before redrawing previous question  //
+     We use jQuery to check for radio selection unlike in next() function //
+     where we used javascript. jQuery requires less code                  */
+    for (var n = 0; n < allQuestions[0].choices[i].length; n++) {
+      if ($("input:checked").val() !== undefined) {
+        givenAnswer[questionCounter] = $("input:checked").val();
+      }
+    }
+   
+    //Print Out Question and choices
+    questionCounter = --questionCounter;
+    i = questionCounter;
+    //Check to see if previously given answer was correct and 
+    // decrement answerTally if so
+    if (givenAnswer[i] == allQuestions[0].correctAnswer[i]) {
+      answerTally = --answerTally;
+    }
+
+    var question = '';
+    var form = '';
+    if (questionCounter <= allQuestions[0].question.length - 1) {
+      question = allQuestions[0].question[i];
+      //Print Out Choices
+      for (var j = 0; j < allQuestions[0].choices[i].length; j++) {
+        form += "<input class=answers type='radio' name='choice' id=" + j + " value=" + j + ">" + "<span class='choice_text'>&nbsp" + allQuestions[0].choices[i][j] + "</span><br/>";
+      }
+      $("#container").fadeOut("slow", function() {
+        $("#question").html(question);
+        $("#test1").html(form);
+        document.getElementById(givenAnswer[i]).checked = true;
+        $("#container").fadeIn("slow");
+      });
+    }
+    // End of Print Out Previous Question & selections
+    
+     // Print Question #
+    if ( questionCounter < allQuestions[0].question.length) {
+       var totalQuestions = questionCounter;
+       ++totalQuestions;
+       $("#div3").html( "<p>Question " + totalQuestions + " of " +     allQuestions[0].question.length + "</p>");
+    }     
+
+    //Set so we know initial click has taken place and change the button textNode
+    submitAnswerClick = true;
+    button_Render();
+    noSelection = false;
+  });
+  // ------------------------------ // 
+  // End of Previous Click Function //
+  // ------------------------------ //
+  
+     // ------------------      //
+});  // <-- End Document Ready  //
+     // ------------------      //       
+      </script>
+</body>
+    
+</html>
+
