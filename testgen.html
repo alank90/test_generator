@@ -107,8 +107,8 @@
   </div>
   
   <!-- ==========================================================================================================================-->
-      <!---------------------------------- >  
-      <!-- Begin JS/jQuery for page ------ >
+      <!---------------------------------- -->  
+      <!-- Begin JS/jQuery for page ------ -->
  <!-- ===========================================================================================================================-->   
    <script>
 
@@ -226,7 +226,7 @@
                       // Convert letter to number
                      testquestions[0].correctAnswer[i] = testquestions[0].correctAnswer[i].charCodeAt(0) - 97;
                      $( "#question_counter" ).html( "<br/><p>Current Question <em>" + (testquestions[0].question.length  + 1) + "</em></p>" );
-                     CKEDITOR.instances["question"].setData(''); // Cleat CKEditor area
+                     CKEDITOR.instances["question"].setData(''); // Clear CKEditor area
                      $("#test")[0].reset();                      
                    }
                  },
